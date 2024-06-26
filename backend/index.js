@@ -44,7 +44,7 @@ app.use(ensureDatabaseConnection);
 // Route to get suppliers
 app.get('/fyp/unicommerceapp/GetSupplier', async (request, response) => {
   try {
-    const result = await database.collection("unicommercecollection").find({}).toArray();
+    const result = await database.collection("suppliers").find({}).toArray();
     response.send(result);
   } catch (error) {
     response.status(500).send({ error: 'Failed to fetch suppliers' });
@@ -54,8 +54,8 @@ app.get('/fyp/unicommerceapp/GetSupplier', async (request, response) => {
 // Route to add a supplier
 app.post('/fyp/unicommerceapp/AddSupplier', multer().none(), async (request, response) => {
   try {
-    const numOfDocs = await database.collection("unicommercecollection").countDocuments({});
-    await database.collection("unicommercecollection").insertOne({
+    const numOfDocs = await database.collection("suppliers").countDocuments({});
+    await database.collection("suppliers").insertOne({
       id: (numOfDocs + 1).toString(),
       desc: request.body.newSupplier
     });
@@ -68,7 +68,7 @@ app.post('/fyp/unicommerceapp/AddSupplier', multer().none(), async (request, res
 // Route to delete a supplier
 app.delete('/fyp/unicommerceapp/DeleteSupplier', async (request, response) => {
   try {
-    await database.collection("unicommercecollection").deleteOne({
+    await database.collection("suppliers").deleteOne({
       id: request.query.id
     });
     response.json("Deleted Supplier.");
