@@ -12,9 +12,9 @@ const CONNECTION_STRING = "mongodb+srv://jyfong2010:tZWwkIxm4Iw3FtGM@cluster0.od
 const DATABASENAME = "unicommerceapp";
 let database;
 
-const openai = new OpenAI({
-  apiKey: 'sk-fypjy-Kp448rl3XJjZsicjeE5HT3BlbkFJWsMBDpO6Ljpar6eLD5Qf', 
-});
+// const openai = new OpenAI({
+//   apiKey: '', 
+// });
 
 const connectToDatabase = async () => {
   try {

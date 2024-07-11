@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import List from './CRUD/List';
 import './Promotions.css';
 
-const googleApiKey = 'AIzaSyCyRV16sJwHzAdU75NFdYYOXyrw1RbMbNI'; 
 
 function Promotions() {
   const [promotions, setPromotions] = useState([]);
