@@ -1,55 +1,39 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const { MongoClient, ObjectId } = require('mongodb');
+const Express = require("express");
+const { MongoClient } = require("mongodb");
+const cors = require("cors");
+const supplierRoutes = require('./routes');
 
-const app = express();
-const port = 3000;
+const app = Express();
+app.use(cors());
+app.use(Express.json());
 
-app.use(bodyParser.json());
+const CONNECTION_STRING = "mongodb+srv://jyfong2010:tZWwkIxm4Iw3FtGM@cluster0.od9idzi.mongodb.net/unicommerceapp?retryWrites=true&w=majority&appName=Cluster0?directConnection=true";
+const DATABASENAME = "unicommerceapp";
+let database;
 
-const url = 'mongodb://localhost:27017';
-const dbName = 'unicommerceapp';
-let db;
-
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
-  if (err) return console.error(err);
-  db = client.db(dbName);
-  console.log(`Connected to database ${dbName}`);
-});
-
-const corsOptions = {
-  origin: 'http://localhost:3000',  // Adjust this to your frontend origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
+const connectToDatabase = async () => {
+  try {
+    const client = new MongoClient(CONNECTION_STRING, { tls: true, tlsAllowInvalidCertificates: true });
+    await client.connect();
+    database = client.db(DATABASENAME);
+    console.log("Successfully connected to the database");
+  } catch (error) {
+    console.error("Error connecting to the database", error);
+    process.exit(1);
+  }
 };
 
-app.use(cors(corsOptions));
+const ensureDatabaseConnection = (req, res, next) => {
+  if (!database) {
+    return res.status(503).send({ error: 'Database connection not established' });
+  }
+  next();
+};
 
-app.get('/fyp/unicommerceapp/GetSupplier', async (req, res) => {
-  const suppliers = await db.collection('suppliers').find().toArray();
-  res.json(suppliers);
+app.listen(5038, async () => {
+  await connectToDatabase();
+  console.log("Server is running on port 5038");
 });
 
-app.post('/fyp/unicommerceapp/AddSupplier', async (req, res) => {
-  const { newSupplier } = req.body;
-  await db.collection('suppliers').insertOne(newSupplier);
-  res.sendStatus(201);
-});
-
-app.put('/fyp/unicommerceapp/EditSupplier/:id', async (req, res) => {
-  const { id } = req.params;
-  const { desc } = req.body;
-  await db.collection('suppliers').updateOne({ _id: ObjectId(id) }, { $set: desc });
-  res.sendStatus(200);
-});
-
-app.delete('/fyp/unicommerceapp/DeleteSupplier', async (req, res) => {
-  const { id } = req.query;
-  await db.collection('suppliers').deleteOne({ _id: ObjectId(id) });
-  res.sendStatus(200);
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+app.use(ensureDatabaseConnection);
+app.use('/fyp/unicommerceapp', supplierRoutes);

@@ -66,13 +66,20 @@ form {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-form input[type="text"] {
+form input[type="text"], form input[type="email"], .PhoneInput{
   width: 100%;
   padding: 1rem;
   margin-bottom: 1rem;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 1rem;
+}
+
+*:focus {
+  outline: none;
+}
+.PhoneInputInput{
+  border: 0;
 }
 
 form button {
@@ -134,3 +141,4 @@ ul li button.delete {
 ul li button.delete:hover {
   background-color: #c82333;
 }
+

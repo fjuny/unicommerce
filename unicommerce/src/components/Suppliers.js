@@ -31,7 +31,7 @@ function Suppliers() {
 
   const addSupplier = async (supplier) => {
     try {
-      await fetch('http://localhost:3000/fyp/unicommerceapp/AddSupplier', {
+      await fetch('http://localhost:5038/fyp/unicommerceapp/AddSupplier', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newSupplier: supplier })
@@ -44,32 +44,42 @@ function Suppliers() {
     }
   };
 
+  const deleteSupplier = async (id) => {
+    try {
+      console.log('Deleting supplier with ID:', id);
+      const response = await fetch(`http://localhost:5038/fyp/unicommerceapp/DeleteSupplier/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete supplier');
+      }
+      // Update local state only if delete was successful
+      setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier._id !== id));
+      setMessage('Supplier deleted successfully');
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+      setMessage(`Failed to delete supplier: ${error.message}`);
+    }
+  };
+  
   const editSupplier = async (id, supplier) => {
     try {
-      await fetch(`http://localhost:3000/fyp/unicommerceapp/EditSupplier/${id}`, {
+      const response = await fetch(`http://localhost:5038/fyp/unicommerceapp/EditSupplier/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(supplier)
       });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
       fetchSuppliers();
       setEditingSupplier(null);
       setMessage('Supplier edited successfully.');
     } catch (error) {
       console.error('Failed to edit supplier:', error);
       setMessage('Failed to edit supplier.');
-    }
-  };
-
-  const deleteSupplier = async (id) => {
-    try {
-      await fetch(`http://localhost:3000/fyp/unicommerceapp/DeleteSupplier?id=${id}`, {
-        method: 'DELETE'
-      });
-      fetchSuppliers();
-      setMessage('Supplier deleted successfully.');
-    } catch (error) {
-      console.error('Failed to delete supplier:', error);
-      setMessage('Failed to delete supplier.');
     }
   };
 
