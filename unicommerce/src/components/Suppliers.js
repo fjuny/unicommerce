@@ -90,7 +90,7 @@ function Suppliers() {
       {editingSupplier ? (
         <EditForm item={editingSupplier} onEdit={editSupplier} />
       ) : (
-        <AddForm onAdd={addSupplier} />
+        <AddForm onAdd={addSupplier} formType="supplier" />
       )}
       <List items={suppliers} onEdit={setEditingSupplier} onDelete={deleteSupplier} />
     </div>

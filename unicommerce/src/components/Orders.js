@@ -1,41 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import List from './CRUD/List';
-import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import OrdersList from './CRUD/OrdersList';
+import { FaSearch } from 'react-icons/fa';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './Orders.css';
 
-// Order data
 const orders = [
   {
     id: 1,
-    totalPrice: 100,
-    customerLoyalty: 4, // 1-5 scale, 5 being the most loyal
-    orderTime: new Date('2023-05-01'), // Recent orders have higher priority
-    status: 'completed'
+    total: 100,
+    date: new Date('2023-05-01'),
+    status: 'completed',
+    supplierName: 'Supplier A',
+    customerUsername: 'customer1',
+    product: {
+      name: 'Product 1',
+      image: '...base64image...',
+      quantity: 2
+    }
   },
   {
     id: 2,
-    totalPrice: 150,
-    customerLoyalty: 3,
-    orderTime: new Date('2023-04-15'),
-    status: 'to-ship'
+    total: 150,
+    date: new Date('2023-04-15'),
+    status: 'to-ship',
+    supplierName: 'Supplier B',
+    customerUsername: 'customer2',
+    product: {
+      name: 'Product 2',
+      image: '...base64image...',
+      quantity: 1
+    }
   },
-  {
-    id: 3,
-    totalPrice: 80,
-    customerLoyalty: 5,
-    orderTime: new Date('2023-05-05'),
-    status: 'unpaid'
-  },
-  {
-    id: 4,
-    totalPrice: 120,
-    customerLoyalty: 2,
-    orderTime: new Date('2023-04-20'),
-    status: 'shipping'
-  }
+  // Add more orders as needed
 ];
 
 function Orders() {
@@ -45,6 +43,7 @@ function Orders() {
   const [searchField, setSearchField] = useState('productId');
   const [searchDate, setSearchDate] = useState(null);
   const [priorityCriteria, setPriorityCriteria] = useState(['', '', '']);
+  const [dbUpdateMessage, setDbUpdateMessage] = useState('');
 
   useEffect(() => {
     fetchOrders();
@@ -53,32 +52,22 @@ function Orders() {
   const fetchOrders = () => {
     let filteredOrders = orders;
 
-    // Filter orders based on active tab
     if (activeTab !== 'all') {
-      filteredOrders = filteredOrders.filter(order => order.status === activeTab);
+      filteredOrders = filteredOrders.filter(order => order.status.toLowerCase() === activeTab);
     }
 
-    // Filter orders based on search term and field
     if (searchTerm) {
-      if (searchField === 'date') {
-        filteredOrders = filteredOrders.filter(order =>
-          order.orderTime.toISOString().slice(0, 10) === searchTerm
-        );
-      } else {
-        filteredOrders = filteredOrders.filter(order =>
-          order[searchField].toString().includes(searchTerm)
-        );
-      }
-    }
-
-    // Filter orders based on search date
-    if (searchDate) {
       filteredOrders = filteredOrders.filter(order =>
-        order.orderTime.toISOString().slice(0, 10) === searchDate.toISOString().slice(0, 10)
+        order[searchField].toString().toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Sort orders based on weighted criteria
+    if (searchDate) {
+      filteredOrders = filteredOrders.filter(order =>
+        order.date.toISOString().slice(0, 10) === searchDate.toISOString().slice(0, 10)
+      );
+    }
+
     const orderedOrders = sortOrders(filteredOrders, priorityCriteria);
 
     setDisplayOrders(orderedOrders);
@@ -89,75 +78,41 @@ function Orders() {
   };
 
   const searchOptions = [
-    { value: 'productId', label: 'Product ID' },
+    { value: 'id', label: 'Order ID' },
     { value: 'productName', label: 'Product Name' },
     { value: 'date', label: 'Date' }
   ];
 
   const criteriaOptions = [
-    { value: 'totalPrice', label: 'Total Price' },
+    { value: 'total', label: 'Total Purchase' },
     { value: 'customerLoyalty', label: 'Customer Loyalty' },
-    { value: 'orderTime', label: 'Order Time' }
+    { value: 'date', label: 'Order Time' }
   ];
 
   const handleCriteriaChange = (index, option) => {
     const updatedCriteria = [...priorityCriteria];
     updatedCriteria[index] = option.value;
     setPriorityCriteria(updatedCriteria);
+
+    if (updatedCriteria.every(criteria => criteria !== '')) {
+      setDbUpdateMessage('Database updated successfully with new criteria.');
+    } else {
+      setDbUpdateMessage('');
+    }
   };
 
   return (
     <div className="orders-container">
       <h1>Orders</h1>
       <div className="nav-tabs">
-        <button
-          className={activeTab === 'all' ? 'active' : ''}
-          onClick={() => setActiveTab('all')}
-        >
-          All Orders
-        </button>
-        <button
-          className={activeTab === 'unpaid' ? 'active' : ''}
-          onClick={() => setActiveTab('unpaid')}
-        >
-          Unpaid
-        </button>
-        <button
-          className={activeTab === 'to-ship' ? 'active' : ''}
-          onClick={() => setActiveTab('to-ship')}
-        >
-          To Ship
-        </button>
-        <button
-          className={activeTab === 'shipping' ? 'active' : ''}
-          onClick={() => setActiveTab('shipping')}
-        >
-          Shipping
-        </button>
-        <button
-          className={activeTab === 'completed' ? 'active' : ''}
-          onClick={() => setActiveTab('completed')}
-        >
-          Completed
-        </button>
-        <button
-          className={activeTab === 'cancellation' ? 'active' : ''}
-          onClick={() => setActiveTab('cancellation')}
-        >
-          Cancellation
-        </button>
-        <button
-          className={activeTab === 'return-refund' ? 'active' : ''}
-          onClick={() => setActiveTab('return-refund')}
-        >
-          Return/Refund
-        </button>
-        <button
-          className={activeTab === 'failed-delivery' ? 'active' : ''}
-          onClick={() => setActiveTab('failed-delivery')}
-        >
-          Failed Delivery
-        </button>
+        <button className={activeTab === 'all' ? 'active' : ''} onClick={() => setActiveTab('all')}>All Orders</button>
+        <button className={activeTab === 'unpaid' ? 'active' : ''} onClick={() => setActiveTab('unpaid')}>Unpaid</button>
+        <button className={activeTab === 'to-ship' ? 'active' : ''} onClick={() => setActiveTab('to-ship')}>To Ship</button>
+        <button className={activeTab === 'shipping' ? 'active' : ''} onClick={() => setActiveTab('shipping')}>Shipping</button>
+        <button className={activeTab === 'completed' ? 'active' : ''} onClick={() => setActiveTab('completed')}>Completed</button>
+        <button className={activeTab === 'cancellation' ? 'active' : ''} onClick={() => setActiveTab('cancellation')}>Cancellation</button>
+        <button className={activeTab === 'return-refund' ? 'active' : ''} onClick={() => setActiveTab('return-refund')}>Return/Refund</button>
+        <button className={activeTab === 'failed-delivery' ? 'active' : ''} onClick={() => setActiveTab('failed-delivery')}>Failed Delivery</button>
       </div>
       <div className="search-container">
         <input
@@ -165,6 +120,7 @@ function Orders() {
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          className="form-input"
         />
         <Select
           options={searchOptions}
@@ -176,7 +132,7 @@ function Orders() {
           selected={searchDate}
           onChange={(date) => setSearchDate(date)}
           placeholderText="Search by date"
-          className="search-date-picker"
+          className="search-date-picker form-input"
         />
         <button className="search-btn" onClick={fetchOrders}>
           <FaSearch />
@@ -190,6 +146,7 @@ function Orders() {
               options={criteriaOptions}
               value={criteriaOptions.find(option => option.value === priorityCriteria[0])}
               onChange={(option) => handleCriteriaChange(0, option)}
+              className="react-select-container"
             />
           </label>
           <label>
@@ -198,6 +155,7 @@ function Orders() {
               options={criteriaOptions.filter(option => option.value !== priorityCriteria[0])}
               value={criteriaOptions.find(option => option.value === priorityCriteria[1])}
               onChange={(option) => handleCriteriaChange(1, option)}
+              className="react-select-container"
             />
           </label>
           <label>
@@ -206,30 +164,31 @@ function Orders() {
               options={criteriaOptions.filter(option => option.value !== priorityCriteria[0] && option.value !== priorityCriteria[1])}
               value={criteriaOptions.find(option => option.value === priorityCriteria[2])}
               onChange={(option) => handleCriteriaChange(2, option)}
+              className="react-select-container"
             />
           </label>
         </div>
       </div>
-      <div className="carousel-container">
-        <List items={displayOrders} onDelete={deleteOrder} />
+      {dbUpdateMessage && <p>{dbUpdateMessage}</p>}
+      <div className="order-list-container">
+        <OrdersList items={displayOrders} onEdit={() => {}} onDelete={deleteOrder} />
       </div>
     </div>
   );
 }
 
-// Weighted random algorithm for order ranking
 function calculateOrderScore(order, priorityCriteria) {
-  const { totalPrice, customerLoyalty, orderTime } = order;
+  const { total, customerLoyalty, date } = order;
   const weights = {
-    totalPrice: priorityCriteria[0] === 'totalPrice' ? 0.45 : priorityCriteria[1] === 'totalPrice' ? 0.35 : 0.2,
+    total: priorityCriteria[0] === 'total' ? 0.45 : priorityCriteria[1] === 'total' ? 0.35 : 0.2,
     customerLoyalty: priorityCriteria[0] === 'customerLoyalty' ? 0.45 : priorityCriteria[1] === 'customerLoyalty' ? 0.35 : 0.2,
-    orderTime: priorityCriteria[0] === 'orderTime' ? 0.45 : priorityCriteria[1] === 'orderTime' ? 0.35 : 0.2
+    date: priorityCriteria[0] === 'date' ? 0.45 : priorityCriteria[1] === 'date' ? 0.35 : 0.2
   };
 
   return (
-    totalPrice * weights.totalPrice +
+    total * weights.total +
     customerLoyalty * weights.customerLoyalty +
-    (new Date().getTime() - orderTime.getTime()) * weights.orderTime // Newer orders have higher scores
+    (new Date().getTime() - date.getTime()) * weights.date
   );
 }
 

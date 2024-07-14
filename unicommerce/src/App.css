@@ -47,6 +47,7 @@ nav ul li a:hover {
   color: #007bff;
 }
 
+/* Add padding to the main content to account for the fixed navbar */
 .main-content {
   padding-top: 80px; /* Adjust this to match the height of your navbar */
 }
@@ -66,7 +67,7 @@ form {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-form input[type="text"], form input[type="email"], .PhoneInput{
+form input[type="text"], form input[type="email"], .PhoneInput {
   width: 100%;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -78,7 +79,8 @@ form input[type="text"], form input[type="email"], .PhoneInput{
 *:focus {
   outline: none;
 }
-.PhoneInputInput{
+
+.PhoneInputInput {
   border: 0;
 }
 
@@ -141,4 +143,3 @@ ul li button.delete {
 ul li button.delete:hover {
   background-color: #c82333;
 }
-

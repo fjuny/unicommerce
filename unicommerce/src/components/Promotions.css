@@ -197,3 +197,36 @@
 .influencers-list button:hover {
   background-color: #0056b3;
 }
+
+
+/* Education Hub Styles */
+.education-hub-container {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.education-hub-container h2 {
+  margin-bottom: 20px;
+}
+
+.training-section,
+.entrepreneurship-section {
+  margin-bottom: 20px;
+}
+
+.training-section h3,
+.entrepreneurship-section h3 {
+  margin-bottom: 10px;
+}
+
+.training-section p,
+.entrepreneurship-section p {
+  margin: 0;
+  padding: 10px;
+  background-color: #e9ecef;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import List from './CRUD/List';
 import './Promotions.css';
 
-
 function Promotions() {
   const [promotions, setPromotions] = useState([]);
   const [activeTab, setActiveTab] = useState('vouchers');
@@ -142,9 +141,15 @@ function Promotions() {
         >
           Influencers
         </button>
+        <button
+          className={activeTab === 'education-hub' ? 'active' : ''}
+          onClick={() => setActiveTab('education-hub')}
+        >
+          Education Hub
+        </button>
       </div>
       <div className="promotions-list">
-        {activeTab !== 'ai-copywriting' && activeTab !== 'influencers' && (
+        {activeTab !== 'ai-copywriting' && activeTab !== 'influencers' && activeTab !== 'education-hub' && (
           <List
             items={promotions}
             onEdit={editPromotion}
@@ -263,6 +268,19 @@ function Promotions() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      )}
+      {activeTab === 'education-hub' && (
+        <div className="education-hub-container">
+          <h2>Education Hub</h2>
+          <div className="training-section">
+            <h3>Organic Digital Marketing</h3>
+            <p>Access comprehensive training programs to enhance skills in organic digital marketing, enabling businesses to effectively reach their target audiences through various marketing strategies.</p>
+          </div>
+          <div className="entrepreneurship-section">
+            <h3>LnD for Entrepreneurship</h3>
+            <p>Support for multi-region and multi-language features, including localized content and Learning and Development programs for entrepreneurship (e.g., HRDF/e-Latih).</p>
           </div>
         </div>
       )}

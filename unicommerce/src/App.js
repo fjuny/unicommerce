@@ -5,6 +5,7 @@ import Suppliers from './components/Suppliers';
 import Products from './components/Products';
 import Orders from './components/Orders';
 import Promotions from './components/Promotions';
+import Dashboard from './components/Dashboard';
 import './App.css';
 
 function App() {
@@ -12,13 +13,16 @@ function App() {
     <Router>
       <div className="App">
         <Navbar />
-        <Routes>
-          <Route path="/suppliers" element={<Suppliers />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/promotions" element={<Promotions />} />
-          <Route path="/" element={<h1>Welcome to UniCommerce</h1>} />
-        </Routes>
+        <div className="main-content">
+          <Routes>
+            <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/promotions" element={<Promotions />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );

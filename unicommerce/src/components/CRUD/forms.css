@@ -1,29 +1,215 @@
-/* forms.css */
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f7f9fc;
+  color: #333;
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+nav {
+  background-color: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+}
+
+nav ul li {
+  margin: 0 1rem;
+}
+
+nav ul li a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+  color: #007bff;
+}
+
+.main-content {
+  padding-top: 80px; /* Adjust this to match the height of your navbar */
+}
+
+h1 {
+  margin: 1.5rem 0;
+  color: #007bff;
+  font-size: 2rem;
+}
+
+/* Forms CSS */
 .form-input {
-    padding: 8px 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .form-input:focus {
-    outline: none;
-    border-color: #4CAF50;
-  }
-  
-  .form-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .form-button:hover {
-    background-color: #45a049;
-  }
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+.form-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 1rem;
+}
+
+.form-button:hover {
+  background-color: #0056b3;
+}
+.image-preview {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.image-upload-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 1rem;
+  display: inline-block; /* Ensure button stays in place */
+}
+
+.image-upload-button input {
+  display: none; /* Hide the file input */
+}
+
+.image-upload-container {
+  margin-bottom: 1rem;
+}
+
+.price-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-input select {
+  width: 30%;
+}
+
+.price-input input {
+  width: 70%;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.shipping-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.shipping-options label {
+  display: flex;
+  align-items: center;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.shipping-options label:hover {
+  background-color: #e0e0e0;
+}
+
+.shipping-options input[type="checkbox"] {
+  margin-right: 10px;
+  accent-color: #4CAF50;
+}
+
+.price-quantity-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.price-input,
+.quantity-input {
+  width: 70%;
+}
+
+.quantity-input {
+  width: 25%;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+}
+
+.css-b62m3t-container {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Category and Subcategory Dropdowns */
+.select-container {
+  margin-bottom: 1rem;
+}
+
+.select-container select {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  appearance: none;
+  background: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23333" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>') no-repeat right 10px center;
+  background-size: 10px;
+  cursor: pointer;
+}
+
+.select-container select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.select-container select option {
+  padding: 10px 15px;
+}
+
+.sku-image-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

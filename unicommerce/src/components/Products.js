@@ -6,50 +6,75 @@ import EditForm from './CRUD/EditForm';
 function Products() {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
-    const response = await fetch('/fyp/unicommerceapp/GetProducts');
-    const data = await response.json();
-    setProducts(data);
+    try {
+      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetProducts'); // Ensure this is the correct endpoint
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setError(error.message);
+    }
   };
 
-  const addProduct = async (desc) => {
-    await fetch('/fyp/unicommerceapp/AddProduct', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ newProduct: desc })
-    });
-    fetchProducts();
+  const addProduct = async (formData) => {
+    try {
+      await fetch('http://localhost:5038/fyp/unicommerceapp/AddProduct', { // Ensure this is the correct endpoint
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      fetchProducts();
+    } catch (error) {
+      console.error('Error adding product:', error);
+      setError(error.message);
+    }
   };
 
-  const editProduct = async (id, desc) => {
-    await fetch(`/fyp/unicommerceapp/EditProduct/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ desc })
-    });
-    fetchProducts();
-    setEditingProduct(null);
+  const editProduct = async (id, formData) => {
+    try {
+      await fetch(`http://localhost:5038/fyp/unicommerceapp/EditProduct/${id}`, { // Ensure this is the correct endpoint
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      fetchProducts();
+      setEditingProduct(null);
+    } catch (error) {
+      console.error('Error editing product:', error);
+      setError(error.message);
+    }
   };
 
   const deleteProduct = async (id) => {
-    await fetch(`/fyp/unicommerceapp/DeleteProduct?id=${id}`, {
-      method: 'DELETE'
-    });
-    fetchProducts();
+    try {
+      await fetch(`http://localhost:5038/fyp/unicommerceapp/DeleteProduct/${id}`, { // Ensure this is the correct endpoint
+        method: 'DELETE'
+      });
+      fetchProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setError(error.message);
+    }
   };
 
   return (
     <div>
       <h1>Products</h1>
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
       {editingProduct ? (
         <EditForm item={editingProduct} onEdit={editProduct} />
       ) : (
-        <AddForm onAdd={addProduct} />
+        <AddForm onAdd={addProduct} formType="product" />
       )}
       <List items={products} onEdit={setEditingProduct} onDelete={deleteProduct} />
     </div>

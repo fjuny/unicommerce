@@ -2,7 +2,6 @@ const Express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
 const multer = require("multer");
-const OpenAI = require("openai");
 
 const app = Express();
 app.use(cors());
@@ -11,10 +10,6 @@ app.use(Express.json());
 const CONNECTION_STRING = "mongodb+srv://jyfong2010:tZWwkIxm4Iw3FtGM@cluster0.od9idzi.mongodb.net/unicommerceapp?retryWrites=true&w=majority&appName=Cluster0?directConnection=true";
 const DATABASENAME = "unicommerceapp";
 let database;
-
-// const openai = new OpenAI({
-//   apiKey: '', 
-// });
 
 const connectToDatabase = async () => {
   try {
@@ -43,81 +38,106 @@ app.listen(5038, async () => {
 
 app.use(ensureDatabaseConnection);
 
-// Function to generate caption using OpenAI
-const generateCaption = async (productName, keyword) => {
-  const prompt = `Generate a creative and engaging caption for a product named "${productName}" targeting customers interested in "${keyword}".`;
-
+// Product-related routes
+app.get('/fyp/unicommerceapp/GetProducts', async (req, res) => {
   try {
-    const response = await openai.completions.create({
-      model: "gpt-3.5-turbo",
-      prompt: prompt,
-      max_tokens: 60,
-    });
-
-    const caption = response.choices[0].text.trim();
-    return caption;
+    const products = await database.collection("products").find({}).toArray();
+    res.json(products);
   } catch (error) {
-      console.error('Error generating caption with OpenAI:', error.response ? error.response.data : error.message);
-      throw new Error(`Failed to generate caption: ${error.response ? error.response.data : error.message}`);
-  }
-};
-
-// New endpoint to generate caption
-app.post('/fyp/unicommerceapp/GenerateCaption', async (req, res) => {
-  try {
-    const { productName, keyword } = req.body;
-    if (!productName || !keyword) {
-      return res.status(400).send({ error: 'Product name and keyword are required' });
-    }
-
-    const generatedCaption = await generateCaption(productName, keyword);
-    res.send({ caption: generatedCaption });
-  } catch (error) {
-    console.error('Error generating caption:', error);
-    res.status(503).send({ error: 'Failed to generate caption' });
+    console.error('Failed to fetch products:', error);
+    res.status(500).send({ error: 'Failed to fetch products' });
   }
 });
 
-// Existing routes
-app.get('/fyp/unicommerceapp/GetSupplier', async (request, response) => {
+app.post('/fyp/unicommerceapp/AddProduct', multer().none(), async (req, res) => {
+  try {
+    const newProduct = req.body;
+    await database.collection("products").insertOne(newProduct);
+    res.status(201).send("Product added successfully.");
+  } catch (error) {
+    console.error('Failed to add product:', error);
+    res.status(500).send({ error: 'Failed to add product' });
+  }
+});
+
+app.put('/fyp/unicommerceapp/EditProduct/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid product ID' });
+    }
+    const updateData = req.body;
+    const result = await database.collection("products").updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.send("Product updated successfully.");
+  } catch (error) {
+    console.error('Failed to update product:', error);
+    res.status(500).send({ error: 'Failed to update product' });
+  }
+});
+
+app.delete('/fyp/unicommerceapp/DeleteProduct/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid product ID' });
+    }
+    const result = await database.collection('products').deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.send("Product deleted successfully.");
+  } catch (error) {
+    console.error('Failed to delete product:', error);
+    res.status(500).send({ error: 'Failed to delete product' });
+  }
+});
+
+// Supplier-related routes (as you had them)
+app.get('/fyp/unicommerceapp/GetSupplier', async (req, res) => {
   try {
     const result = await database.collection("suppliers").find({}).toArray();
-    response.send(result);
+    res.send(result);
   } catch (error) {
-    response.status(500).send({ error: 'Failed to fetch suppliers' });
+    res.status(500).send({ error: 'Failed to fetch suppliers' });
   }
 });
 
-app.post('/fyp/unicommerceapp/AddSupplier', multer().none(), async (request, response) => {
+app.post('/fyp/unicommerceapp/AddSupplier', multer().none(), async (req, res) => {
   try {
     const numOfDocs = await database.collection("suppliers").countDocuments({});
     await database.collection("suppliers").insertOne({
       id: (numOfDocs + 1).toString(),
-      desc: request.body.newSupplier
+      desc: req.body.newSupplier
     });
-    response.json("Added Supplier.");
+    res.json("Added Supplier.");
   } catch (error) {
-    response.status(500).send({ error: 'Failed to add supplier' });
+    res.status(500).send({ error: 'Failed to add supplier' });
   }
 });
 
-app.put('/fyp/unicommerceapp/EditSupplier/:id', async (request, response) => {
+app.put('/fyp/unicommerceapp/EditSupplier/:id', async (req, res) => {
   try {
-    const id = request.params.id;
+    const id = req.params.id;
     if (!ObjectId.isValid(id)) {
-      return response.status(400).json({ error: 'Invalid supplier ID' });
+      return res.status(400).json({ error: 'Invalid supplier ID' });
     }
-    const updateData = request.body;
+    const updateData = req.body;
     const result = await database.collection("suppliers").updateOne(
       { _id: new ObjectId(id) },
       { $set: updateData }
     );
     if (result.matchedCount === 0) {
-      return response.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: 'Supplier not found' });
     }
-    response.json("Updated Supplier.");
+    res.json("Updated Supplier.");
   } catch (error) {
-    response.status(500).send({ error: 'Failed to update supplier' });
+    res.status(500).send({ error: 'Failed to update supplier' });
   }
 });
 
