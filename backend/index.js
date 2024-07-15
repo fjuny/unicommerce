@@ -154,3 +154,13 @@ app.delete('/fyp/unicommerceapp/DeleteSupplier/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to delete supplier', error: error.message });
   }
 });
+
+app.get('/fyp/unicommerceapp/GetOrders', async (req, res) => {
+  try {
+    const orders = await database.collection("ordersWithDetails").find({}).toArray();
+    res.json(orders);
+  } catch (error) {
+    console.error('Failed to fetch orders:', error);
+    res.status(500).send({ error: 'Failed to fetch orders' });
+  }
+});

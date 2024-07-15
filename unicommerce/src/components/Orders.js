@@ -6,41 +6,11 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './Orders.css';
 
-const orders = [
-  {
-    id: 1,
-    total: 100,
-    date: new Date('2023-05-01'),
-    status: 'completed',
-    supplierName: 'Supplier A',
-    customerUsername: 'customer1',
-    product: {
-      name: 'Product 1',
-      image: '...base64image...',
-      quantity: 2
-    }
-  },
-  {
-    id: 2,
-    total: 150,
-    date: new Date('2023-04-15'),
-    status: 'to-ship',
-    supplierName: 'Supplier B',
-    customerUsername: 'customer2',
-    product: {
-      name: 'Product 2',
-      image: '...base64image...',
-      quantity: 1
-    }
-  },
-  // Add more orders as needed
-];
-
-function Orders() {
+const Orders = () => {
   const [displayOrders, setDisplayOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchField, setSearchField] = useState('productId');
+  const [searchField, setSearchField] = useState('id');
   const [searchDate, setSearchDate] = useState(null);
   const [priorityCriteria, setPriorityCriteria] = useState(['', '', '']);
   const [dbUpdateMessage, setDbUpdateMessage] = useState('');
@@ -49,28 +19,37 @@ function Orders() {
     fetchOrders();
   }, [activeTab, searchTerm, searchField, searchDate, priorityCriteria]);
 
-  const fetchOrders = () => {
-    let filteredOrders = orders;
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetOrders');
+      const orders = await response.json();
+      console.log('Fetched Orders:', orders); // Debugging log
 
-    if (activeTab !== 'all') {
-      filteredOrders = filteredOrders.filter(order => order.status.toLowerCase() === activeTab);
+      let filteredOrders = orders;
+
+      if (activeTab !== 'all') {
+        filteredOrders = filteredOrders.filter(order => order.status.toLowerCase() === activeTab);
+      }
+
+      if (searchTerm) {
+        filteredOrders = filteredOrders.filter(order =>
+          order[searchField]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      if (searchDate) {
+        filteredOrders = filteredOrders.filter(order =>
+          new Date(order.date).toISOString().slice(0, 10) === searchDate.toISOString().slice(0, 10)
+        );
+      }
+
+      const orderedOrders = sortOrders(filteredOrders, priorityCriteria);
+      console.log('Ordered Orders:', orderedOrders); // Debugging log
+
+      setDisplayOrders(orderedOrders);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
     }
-
-    if (searchTerm) {
-      filteredOrders = filteredOrders.filter(order =>
-        order[searchField].toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (searchDate) {
-      filteredOrders = filteredOrders.filter(order =>
-        order.date.toISOString().slice(0, 10) === searchDate.toISOString().slice(0, 10)
-      );
-    }
-
-    const orderedOrders = sortOrders(filteredOrders, priorityCriteria);
-
-    setDisplayOrders(orderedOrders);
   };
 
   const deleteOrder = async (id) => {
@@ -79,7 +58,7 @@ function Orders() {
 
   const searchOptions = [
     { value: 'id', label: 'Order ID' },
-    { value: 'productName', label: 'Product Name' },
+    { value: 'productDetails.product_name', label: 'Product Name' },
     { value: 'date', label: 'Date' }
   ];
 
@@ -175,7 +154,7 @@ function Orders() {
       </div>
     </div>
   );
-}
+};
 
 function calculateOrderScore(order, priorityCriteria) {
   const { total, customerLoyalty, date } = order;
@@ -188,7 +167,7 @@ function calculateOrderScore(order, priorityCriteria) {
   return (
     total * weights.total +
     customerLoyalty * weights.customerLoyalty +
-    (new Date().getTime() - date.getTime()) * weights.date
+    (new Date().getTime() - new Date(date).getTime()) * weights.date
   );
 }
 
@@ -211,6 +190,9 @@ function getNextOrder(orders, priorityCriteria) {
 function sortOrders(orders, priorityCriteria) {
   const sortedOrders = [];
   const remainingOrders = [...orders];
+
+  // Sort by most recent date first
+  remainingOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   while (remainingOrders.length > 0) {
     const nextOrder = getNextOrder(remainingOrders, priorityCriteria);
