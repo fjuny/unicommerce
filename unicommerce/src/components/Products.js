@@ -14,7 +14,7 @@ function Products() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetProducts'); // Ensure this is the correct endpoint
+      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetProducts');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -28,7 +28,7 @@ function Products() {
 
   const addProduct = async (formData) => {
     try {
-      await fetch('http://localhost:5038/fyp/unicommerceapp/AddProduct', { // Ensure this is the correct endpoint
+      await fetch('http://localhost:5038/fyp/unicommerceapp/AddProduct', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -42,7 +42,7 @@ function Products() {
 
   const editProduct = async (id, formData) => {
     try {
-      await fetch(`http://localhost:5038/fyp/unicommerceapp/EditProduct/${id}`, { // Ensure this is the correct endpoint
+      await fetch(`http://localhost:5038/fyp/unicommerceapp/EditProduct/${id}`, { 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -57,7 +57,7 @@ function Products() {
 
   const deleteProduct = async (id) => {
     try {
-      await fetch(`http://localhost:5038/fyp/unicommerceapp/DeleteProduct/${id}`, { // Ensure this is the correct endpoint
+      await fetch(`http://localhost:5038/fyp/unicommerceapp/DeleteProduct/${id}`, { 
         method: 'DELETE'
       });
       fetchProducts();

@@ -53,8 +53,23 @@ const Orders = () => {
   };
 
   const deleteOrder = async (id) => {
-    // Delete order logic
+    try {
+      const response = await fetch(`http://localhost:5038/fyp/unicommerceapp/DeleteOrder/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedOrders = displayOrders.filter(order => order.id !== id);
+        setDisplayOrders(updatedOrders);
+        console.log(`Order with ID ${id} deleted successfully`);
+      } else {
+        console.error(`Failed to delete order with ID ${id}`);
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+    }
   };
+  
 
   const searchOptions = [
     { value: 'id', label: 'Order ID' },

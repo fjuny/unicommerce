@@ -54,7 +54,6 @@ function Suppliers() {
         const data = await response.json();
         throw new Error(data.error || 'Failed to delete supplier');
       }
-      // Update local state only if delete was successful
       setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier._id !== id));
       setMessage('Supplier deleted successfully');
     } catch (error) {
