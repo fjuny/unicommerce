@@ -45,7 +45,7 @@ function AddForm({ onAdd, formType }) {
         label: `${currency.code} - ${currency.currency}`
       }));
       setCurrencyOptions(currencyData);
-      setCurrency(currencyData.find(option => option.value === 'MYR')); // Default to MYR
+      setCurrency(currencyData.find(option => option.value === 'MYR'));
     };
     fetchCurrencies();
   }, []);

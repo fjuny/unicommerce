@@ -23,7 +23,6 @@ const SyncPlus = () => {
   });
 
   useEffect(() => {
-    // Initialize TalkJS
     const talkJSUser = new talkjs.User({
       id: 'user-id',
       name: 'John Doe',
@@ -32,14 +31,12 @@ const SyncPlus = () => {
     });
     setTalkJSUser(talkJSUser);
 
-    // Initialize VideoSDK Live
     const client = new VideoSDKLiveClient({
       region: 'us',
       token: 'your-videosdk-token'
     });
     setVideoSDKClient(client);
 
-    // Initialize Stream Video
     const streamClient = new StreamVideoClient({
       apiKey: 'your-stream-api-key',
       user: { id: 'user-id', name: 'John Doe' },
@@ -130,7 +127,6 @@ const MultiChannelSync = ({ syncSettings, onToggleSync }) => {
             Facebook
           </label>
         </div>
-        {/* Add similar checkboxes for other platforms */}
       </div>
     </div>
   );

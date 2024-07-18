@@ -36,30 +36,25 @@ const getImageBufferBySKU = (imageFolder, skuId) => {
   if (fs.existsSync(imagePath)) {
     return fs.readFileSync(imagePath);
   }
-  return null; // or handle missing image case
+  return null;
 };
 
 const uploadData = async () => {
   try {
-    const collection = database.collection('products'); // Ensure your collection name is 'products'
+    const collection = database.collection('products'); 
 
-    // Read JSON data from the products.json file
     const products = JSON.parse(fs.readFileSync('products.json', 'utf8'));
 
-    // Directory containing images
     const imageFolder = path.join(__dirname, 'images');
 
-    // Iterate over the products
     for (let product of products) {
-      // Assign the image to the product by SKU ID
       const imageBuffer = getImageBufferBySKU(imageFolder, product.sku_id);
       if (imageBuffer) {
-        product.image = imageBuffer.toString('base64'); // Convert buffer to base64 string for storage
+        product.image = imageBuffer.toString('base64'); 
       } else {
         console.warn(`No image found for SKU ID: ${product.sku_id}`);
       }
 
-      // Insert the product into the database
       await collection.insertOne(product);
       console.log(`Inserted product with SKU ID: ${product.sku_id}`);
     }
@@ -77,7 +72,6 @@ app.listen(5038, async () => {
 
 app.use(ensureDatabaseConnection);
 
-// Add a new route for uploading data
 app.post('/fyp/unicommerceapp/upload-data', async (req, res) => {
   try {
     await uploadData();

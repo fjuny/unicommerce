@@ -1,5 +1,5 @@
 import React from 'react';
-import './OrdersList.css'; // Import the CSS file
+import './OrdersList.css'; 
 
 function OrdersList({ items, onEdit, onDelete }) {
   return (

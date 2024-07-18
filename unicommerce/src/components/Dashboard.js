@@ -14,7 +14,7 @@ const Dashboard = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setSuppliers(data.slice(0, 5)); // Get the first 5 suppliers
+      setSuppliers(data.slice(0, 5)); 
     } catch (error) {
       console.error('Failed to fetch suppliers:', error);
     }

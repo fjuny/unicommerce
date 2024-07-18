@@ -1,4 +1,3 @@
-/* Basic Reset */
 * {
   margin: 0;
   padding: 0;
@@ -48,7 +47,7 @@ nav ul li a:hover {
 }
 
 .main-content {
-  padding-top: 80px; /* Adjust this to match the height of your navbar */
+  padding-top: 80px; 
 }
 
 h1 {
@@ -57,7 +56,6 @@ h1 {
   font-size: 2rem;
 }
 
-/* Forms CSS */
 .form-input {
   padding: 10px 15px;
   font-size: 16px;
@@ -163,7 +161,6 @@ h1 {
   margin-bottom: 1rem;
 }
 
-/* Category and Subcategory Dropdowns */
 .select-container {
   margin-bottom: 1rem;
 }
@@ -189,7 +186,6 @@ h1 {
   padding: 10px 15px;
 }
 
-/* Orders Specific CSS */
 .orders-container {
   padding: 20px;
   background-color: #FFFFFF;

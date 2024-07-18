@@ -1,5 +1,5 @@
 import React from 'react';
-import './List.css'; // Import the CSS file
+import './List.css'; 
 
 function List({ items, onEdit, onDelete }) {
   const renderContactInfo = (item) => {

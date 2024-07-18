@@ -38,7 +38,6 @@ app.listen(5038, async () => {
 
 app.use(ensureDatabaseConnection);
 
-// Product-related routes
 app.get('/fyp/unicommerceapp/GetProducts', async (req, res) => {
   try {
     const products = await database.collection("products").find({}).toArray();
@@ -98,7 +97,6 @@ app.delete('/fyp/unicommerceapp/DeleteProduct/:id', async (req, res) => {
   }
 });
 
-// Supplier-related routes (as you had them)
 app.get('/fyp/unicommerceapp/GetSupplier', async (req, res) => {
   try {
     const result = await database.collection("suppliers").find({}).toArray();

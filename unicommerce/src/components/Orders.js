@@ -23,8 +23,7 @@ const Orders = () => {
     try {
       const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetOrders');
       const orders = await response.json();
-      console.log('Fetched Orders:', orders); // Debugging log
-
+      console.log('Fetched Orders:', orders); 
       let filteredOrders = orders;
 
       if (activeTab !== 'all') {
@@ -44,7 +43,7 @@ const Orders = () => {
       }
 
       const orderedOrders = sortOrders(filteredOrders, priorityCriteria);
-      console.log('Ordered Orders:', orderedOrders); // Debugging log
+      console.log('Ordered Orders:', orderedOrders);
 
       setDisplayOrders(orderedOrders);
     } catch (error) {
@@ -206,7 +205,6 @@ function sortOrders(orders, priorityCriteria) {
   const sortedOrders = [];
   const remainingOrders = [...orders];
 
-  // Sort by most recent date first
   remainingOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   while (remainingOrders.length > 0) {

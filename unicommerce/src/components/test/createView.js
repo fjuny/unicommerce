@@ -9,7 +9,6 @@ async function createView() {
     const database = client.db('unicommerceapp');
     const orders = database.collection('orders');
 
-    // Create the view with the aggregation pipeline
     await database.createCollection('ordersWithDetails', {
       viewOn: 'orders',
       pipeline: [
