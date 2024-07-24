@@ -12,7 +12,11 @@ function Promotions() {
   const [influencers, setInfluencers] = useState([]);
   const [influencerProfile, setInfluencerProfile] = useState({
     name: '',
-    socialMediaHandles: '',
+    socialMediaHandles: {
+      Instagram: '',
+      YouTube: '',
+      TikTok: ''
+    },
     followerCount: '',
     engagementRate: '',
     niche: '',
@@ -26,8 +30,27 @@ function Promotions() {
   const niches = ['Fashion', 'Tech', 'Beauty', 'Fitness', 'Travel', 'Food', 'Lifestyle', 'Gaming', 'Parenting', 'Others'];
 
   useEffect(() => {
-    fetchPromotions();
+    if (activeTab !== 'influencers') {
+      fetchPromotions();
+    } else {
+      fetchInfluencers();
+    }
   }, [activeTab]);
+
+  const fetchInfluencers = async () => {
+    try {
+      console.log('Fetching influencers...');
+      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetInfluencers');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Fetched influencers:', data);
+      setInfluencers(data);
+    } catch (error) {
+      console.error('Failed to fetch influencers:', error);
+    }
+  };
 
   const fetchPromotions = async () => {
     try {
@@ -66,17 +89,17 @@ function Promotions() {
   const generateCaption = async () => {
     try {
       console.log('Generating caption for:', productName, keyword);
-  
+
       const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GenerateCaption', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productName, keyword })
       });
-  
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
-  
+
       const { caption } = await response.json();
       setGeneratedCaption(caption);
     } catch (error) {
@@ -85,10 +108,14 @@ function Promotions() {
   };
 
   const addInfluencer = () => {
-    setInfluencers([...influencers, influencerProfile]);
+    setInfluencers([...influencers, { ...influencerProfile, _id: Date.now().toString() }]);
     setInfluencerProfile({
       name: '',
-      socialMediaHandles: '',
+      socialMediaHandles: {
+        Instagram: '',
+        YouTube: '',
+        TikTok: ''
+      },
       followerCount: '',
       engagementRate: '',
       niche: '',
@@ -101,8 +128,28 @@ function Promotions() {
 
   const handleInfluencerChange = (e) => {
     const { name, value } = e.target;
-    setInfluencerProfile({ ...influencerProfile, [name]: value });
+    if (name in influencerProfile.socialMediaHandles) {
+      setInfluencerProfile({
+        ...influencerProfile,
+        socialMediaHandles: { ...influencerProfile.socialMediaHandles, [name]: value }
+      });
+    } else {
+      setInfluencerProfile({ ...influencerProfile, [name]: value });
+    }
   };
+
+ // Function to format numbers
+const formatNumber = (num) => {
+  if (num >= 1000000) {
+    const formatted = (num / 1000000).toFixed(2);
+    return formatted.endsWith('.00') ? `${(num / 1000000).toFixed(0)}M` : `${formatted}M`;
+  } else if (num >= 1000) {
+    const formatted = (num / 1000).toFixed(2);
+    return formatted.endsWith('.00') ? `${(num / 1000).toFixed(0)}K` : `${formatted}K`;
+  } else {
+    return num;
+  }
+};
 
   const sortInfluencers = (key) => {
     const sortedInfluencers = [...influencers].sort((a, b) => {
@@ -154,7 +201,6 @@ function Promotions() {
             items={promotions}
             onEdit={editPromotion}
             onDelete={deletePromotion}
-            onGenerateCaption={generateCaption}
           />
         )}
       </div>
@@ -189,9 +235,23 @@ function Promotions() {
           />
           <input
             type="text"
-            name="socialMediaHandles"
-            placeholder="Social Media Handles"
-            value={influencerProfile.socialMediaHandles}
+            name="Instagram"
+            placeholder="Instagram Handle"
+            value={influencerProfile.socialMediaHandles.Instagram}
+            onChange={handleInfluencerChange}
+          />
+          <input
+            type="text"
+            name="YouTube"
+            placeholder="YouTube Channel"
+            value={influencerProfile.socialMediaHandles.YouTube}
+            onChange={handleInfluencerChange}
+          />
+          <input
+            type="text"
+            name="TikTok"
+            placeholder="TikTok Handle"
+            value={influencerProfile.socialMediaHandles.TikTok}
             onChange={handleInfluencerChange}
           />
           <input
@@ -239,53 +299,105 @@ function Promotions() {
             placeholder="Location"
             value={influencerProfile.location}
             onChange={handleInfluencerChange}
-          />
-          <input
-            type="email"
-            name="contactEmail"
-            placeholder="Contact Email"
-            value={influencerProfile.contactEmail}
-            onChange={handleInfluencerChange}
-          />
-          <button onClick={addInfluencer}>Add Influencer</button>
-          <div className="influencers-list">
-            <h3>Influencers</h3>
-            <button onClick={() => sortInfluencers('name')}>Sort by Name</button>
-            <button onClick={() => sortInfluencers('followerCount')}>Sort by Followers</button>
-            <button onClick={() => sortInfluencers('engagementRate')}>Sort by Engagement Rate</button>
-            <ul>
-              {influencers.map((influencer, index) => (
-                <li key={index}>
-                  <p>Name: {influencer.name}</p>
-                  <p>Social Media Handles: {influencer.socialMediaHandles}</p>
-                  <p>Follower Count: {influencer.followerCount}</p>
-                  <p>Engagement Rate: {influencer.engagementRate}%</p>
-                  <p>Niche: {influencer.niche}</p>
-                  <p>Average Likes: {influencer.averageLikes}</p>
-                  <p>Average Comments: {influencer.averageComments}</p>
-                  <p>Location: {influencer.location}</p>
-                  <p>Contact Email: {influencer.contactEmail}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-      {activeTab === 'education-hub' && (
-        <div className="education-hub-container">
-          <h2>Education Hub</h2>
-          <div className="training-section">
-            <h3>Organic Digital Marketing</h3>
-            <p>Access comprehensive training programs to enhance skills in organic digital marketing, enabling businesses to effectively reach their target audiences through various marketing strategies.</p>
-          </div>
-          <div className="entrepreneurship-section">
-            <h3>LnD for Entrepreneurship</h3>
-            <p>Support for multi-region and multi-language features, including localized content and Learning and Development programs for entrepreneurship (e.g., HRDF/e-Latih).</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+              />
+              <input
+                type="email"
+                name="contactEmail"
+                placeholder="Contact Email"
+                value={influencerProfile.contactEmail}
+                onChange={handleInfluencerChange}
+              />
+              <button onClick={addInfluencer}>Add Influencer</button>
+              <div className="influencers-list">
+                <h3>Influencers</h3>
+                <button onClick={() => sortInfluencers('name')}>Sort by Name</button>
+                <button onClick={() => sortInfluencers('followerCount')}>Sort by Followers</button>
+                <button onClick={() => sortInfluencers('engagementRate')}>Sort by Engagement Rate</button>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Social Media</th>
+                      <th>Follower Count</th>
+                      <th>Engagement Rate</th>
+                      <th>Niche</th>
+                      <th>Average Likes</th>
+                      <th>Average Comments</th>
+                      <th>Location</th>
+                      <th>Contact Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {influencers.map((influencer, index) => (
+                      <tr key={index}>
+                        <td>{influencer.name}</td>
+                        <td>
+                          {/* Display social media handles in specific order */}
+                          {influencer.socialMediaHandles.Instagram && (
+    <a 
+      href={`https://instagram.com/${influencer.socialMediaHandles.Instagram.replace(/^@/, '')}`} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      style={{ color: '#E4405F', fontSize: '20px', margin: '0 5px' }}
+    >
+      <i className="fab fa-instagram"></i>
+    </a>
+  )}
+  {influencer.socialMediaHandles.YouTube && (
+    <a 
+      href={`https://youtube.com/${influencer.socialMediaHandles.YouTube.replace(/\s+/g, '')}`} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      style={{ color: '#FF0000', fontSize: '20px', margin: '0 5px' }}
+    >
+      <i className="fab fa-youtube"></i>
+    </a>
+  )}
+                          {influencer.socialMediaHandles.TikTok && (
+                            <a href={`https://tiktok.com/${influencer.socialMediaHandles.TikTok}`} target="_blank" rel="noopener noreferrer" style={{ color: '#000000', fontSize: '20px', margin: '0 5px' }}>
+                              <i className="fab fa-tiktok"></i>
+                            </a>
+                          )}
+                        </td>
+                        
+<td>{formatNumber(influencer.followerCount)}</td>
+<td>{influencer.engagementRate.toFixed(2).replace(/\.00$/, '')}%</td>
+<td>{influencer.niche}</td>
+<td>{formatNumber(influencer.averageLikes)}</td>
+<td>{formatNumber(influencer.averageComments)}</td>
 
-export default Promotions;
+                        <td>{influencer.location}</td>
+                        <td>
+  {influencer.contactEmail && (
+    <a href={`mailto:${influencer.contactEmail}`} target="_blank" rel="noopener noreferrer" style={{ color: '#000000', fontSize: '20px' }}>
+      <i className="fas fa-envelope"></i>
+    </a>
+  )}
+</td>
+
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {activeTab === 'education-hub' && (
+            <div className="education-hub-container">
+              <h2>Education Hub</h2>
+              <div className="training-section">
+                <h3>Organic Digital Marketing</h3>
+                <p>Access comprehensive training programs to enhance skills in organic digital marketing, enabling businesses to effectively reach their target audiences through various marketing strategies.</p>
+              </div>
+              <div className="entrepreneurship-section">
+                <h3>LnD for Entrepreneurship</h3>
+                <p>Support for multi-region and multi-language features, including localized content and Learning and Development programs for entrepreneurship (e.g., HRDF/e-Latih).</p>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    export default Promotions;
+    

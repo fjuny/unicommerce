@@ -9,7 +9,7 @@ const Dashboard = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetSupplier');
+      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetSuppliers');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

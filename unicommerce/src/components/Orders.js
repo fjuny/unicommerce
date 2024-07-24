@@ -12,7 +12,7 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchField, setSearchField] = useState('id');
   const [searchDate, setSearchDate] = useState(null);
-  const [priorityCriteria, setPriorityCriteria] = useState(['', '', '']);
+  const [priorityCriteria, setPriorityCriteria] = useState(['date', 'total', 'customerLoyalty']);
   const [dbUpdateMessage, setDbUpdateMessage] = useState('');
 
   useEffect(() => {
@@ -23,52 +23,41 @@ const Orders = () => {
     try {
       const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetOrders');
       const orders = await response.json();
-      console.log('Fetched Orders:', orders); 
+      console.log('Fetched Orders:', orders);
       let filteredOrders = orders;
-
+  
       if (activeTab !== 'all') {
         filteredOrders = filteredOrders.filter(order => order.status.toLowerCase() === activeTab);
+        console.log('After filtering by tab:', filteredOrders);
       }
-
+  
       if (searchTerm) {
-        filteredOrders = filteredOrders.filter(order =>
-          order[searchField]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        filteredOrders = filteredOrders.filter(order => {
+          const fieldValue = getNestedField(order, searchField);
+          return fieldValue?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        });
+        console.log('After filtering by search term:', filteredOrders);
       }
-
+  
       if (searchDate) {
         filteredOrders = filteredOrders.filter(order =>
           new Date(order.date).toISOString().slice(0, 10) === searchDate.toISOString().slice(0, 10)
         );
+        console.log('After filtering by search date:', filteredOrders);
       }
-
+  
       const orderedOrders = sortOrders(filteredOrders, priorityCriteria);
       console.log('Ordered Orders:', orderedOrders);
-
+  
       setDisplayOrders(orderedOrders);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
     }
   };
-
-  const deleteOrder = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:5038/fyp/unicommerceapp/DeleteOrder/${id}`, {
-        method: 'DELETE',
-      });
   
-      if (response.ok) {
-        const updatedOrders = displayOrders.filter(order => order.id !== id);
-        setDisplayOrders(updatedOrders);
-        console.log(`Order with ID ${id} deleted successfully`);
-      } else {
-        console.error(`Failed to delete order with ID ${id}`);
-      }
-    } catch (error) {
-      console.error('Error deleting order:', error);
-    }
+  const getNestedField = (obj, path) => {
+    return path.split('.').reduce((o, key) => (o ? o[key] : null), obj);
   };
-  
 
   const searchOptions = [
     { value: 'id', label: 'Order ID' },
@@ -84,7 +73,14 @@ const Orders = () => {
 
   const handleCriteriaChange = (index, option) => {
     const updatedCriteria = [...priorityCriteria];
-    updatedCriteria[index] = option.value;
+    const existingIndex = updatedCriteria.indexOf(option.value);
+
+    if (existingIndex !== -1 && existingIndex !== index) {
+      [updatedCriteria[index], updatedCriteria[existingIndex]] = [updatedCriteria[existingIndex], updatedCriteria[index]];
+    } else {
+      updatedCriteria[index] = option.value;
+    }
+
     setPriorityCriteria(updatedCriteria);
 
     if (updatedCriteria.every(criteria => criteria !== '')) {
@@ -97,7 +93,7 @@ const Orders = () => {
   return (
     <div className="orders-container">
       <h1>Orders</h1>
-      <div className="nav-tabs">
+      <div className="nav-tabs-order">
         <button className={activeTab === 'all' ? 'active' : ''} onClick={() => setActiveTab('all')}>All Orders</button>
         <button className={activeTab === 'unpaid' ? 'active' : ''} onClick={() => setActiveTab('unpaid')}>Unpaid</button>
         <button className={activeTab === 'to-ship' ? 'active' : ''} onClick={() => setActiveTab('to-ship')}>To Ship</button>
@@ -164,7 +160,7 @@ const Orders = () => {
       </div>
       {dbUpdateMessage && <p>{dbUpdateMessage}</p>}
       <div className="order-list-container">
-        <OrdersList items={displayOrders} onEdit={() => {}} onDelete={deleteOrder} />
+        <OrdersList items={displayOrders} onEdit={() => {}} />
       </div>
     </div>
   );
@@ -172,21 +168,53 @@ const Orders = () => {
 
 function calculateOrderScore(order, priorityCriteria) {
   const { total, customerLoyalty, date } = order;
+  
+  // Ensure that total, customerLoyalty, and date are valid numbers
+  const validTotal = typeof total === 'number' && !isNaN(total) ? total : 0;
+  const validCustomerLoyalty = typeof customerLoyalty === 'number' && !isNaN(customerLoyalty) ? customerLoyalty : 0;
+  const validDate = new Date(date).getTime();
+
+  if (isNaN(validDate)) {
+    return NaN;
+  }
+
   const weights = {
-    total: priorityCriteria[0] === 'total' ? 0.45 : priorityCriteria[1] === 'total' ? 0.35 : 0.2,
-    customerLoyalty: priorityCriteria[0] === 'customerLoyalty' ? 0.45 : priorityCriteria[1] === 'customerLoyalty' ? 0.35 : 0.2,
+    total: priorityCriteria[0] === 'total' ? 0.2 : priorityCriteria[1] === 'total' ? 0.35 : 0.45,
+    customerLoyalty: priorityCriteria[0] === 'customerLoyalty' ? 0.2 : priorityCriteria[1] === 'customerLoyalty' ? 0.35 : 0.45,
     date: priorityCriteria[0] === 'date' ? 0.45 : priorityCriteria[1] === 'date' ? 0.35 : 0.2
   };
 
   return (
-    total * weights.total +
-    customerLoyalty * weights.customerLoyalty +
-    (new Date().getTime() - new Date(date).getTime()) * weights.date
+    validTotal * weights.total +
+    validCustomerLoyalty * weights.customerLoyalty +
+    (new Date().getTime() - validDate) * weights.date
   );
+}
+
+function sortOrders(orders, priorityCriteria) {
+  const sortedOrders = [];
+  const remainingOrders = [...orders];
+
+  remainingOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+  console.log('After initial date sorting:', remainingOrders);
+
+  while (remainingOrders.length > 0) {
+    const nextOrder = getNextOrder(remainingOrders, priorityCriteria);
+    if (nextOrder) {
+      sortedOrders.push(nextOrder);
+      remainingOrders.splice(remainingOrders.indexOf(nextOrder), 1);
+    } else {
+      break;
+    }
+  }
+  console.log('Sorted Orders:', sortedOrders);
+  return sortedOrders;
 }
 
 function getNextOrder(orders, priorityCriteria) {
   const orderScores = orders.map(order => calculateOrderScore(order, priorityCriteria));
+  console.log('Order Scores:', orderScores);
+
   const totalScore = orderScores.reduce((sum, score) => sum + score, 0);
   const randomScore = Math.random() * totalScore;
 
@@ -199,24 +227,6 @@ function getNextOrder(orders, priorityCriteria) {
   }
 
   return null;
-}
-
-function sortOrders(orders, priorityCriteria) {
-  const sortedOrders = [];
-  const remainingOrders = [...orders];
-
-  remainingOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  while (remainingOrders.length > 0) {
-    const nextOrder = getNextOrder(remainingOrders, priorityCriteria);
-    if (nextOrder) {
-      sortedOrders.push(nextOrder);
-      remainingOrders.splice(remainingOrders.indexOf(nextOrder), 1);
-    } else {
-      break;
-    }
-  }
-  return sortedOrders;
 }
 
 export default Orders;

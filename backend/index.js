@@ -38,6 +38,16 @@ app.listen(5038, async () => {
 
 app.use(ensureDatabaseConnection);
 
+app.get('/fyp/unicommerceapp/GetInfluencers', async (req, res) => {
+  try {
+    const influencers = await database.collection("influencers").find({}).toArray();
+    res.json(influencers);
+  } catch (error) {
+    console.error('Failed to fetch influencers:', error);
+    res.status(500).send({ error: 'Failed to fetch influencers' });
+  }
+});
+
 app.get('/fyp/unicommerceapp/GetProducts', async (req, res) => {
   try {
     const products = await database.collection("products").find({}).toArray();
@@ -97,15 +107,6 @@ app.delete('/fyp/unicommerceapp/DeleteProduct/:id', async (req, res) => {
   }
 });
 
-app.get('/fyp/unicommerceapp/GetSupplier', async (req, res) => {
-  try {
-    const result = await database.collection("suppliers").find({}).toArray();
-    res.send(result);
-  } catch (error) {
-    res.status(500).send({ error: 'Failed to fetch suppliers' });
-  }
-});
-
 app.post('/fyp/unicommerceapp/AddSupplier', multer().none(), async (req, res) => {
   try {
     const numOfDocs = await database.collection("suppliers").countDocuments({});
@@ -160,5 +161,14 @@ app.get('/fyp/unicommerceapp/GetOrders', async (req, res) => {
   } catch (error) {
     console.error('Failed to fetch orders:', error);
     res.status(500).send({ error: 'Failed to fetch orders' });
+  }
+});
+app.get('/fyp/unicommerceapp/GetSuppliers', async (req, res) => {
+  try {
+    const suppliers = await database.collection("suppliers").find({}).toArray();
+    res.json(suppliers);
+  } catch (error) {
+    console.error('Failed to fetch suppliers:', error);
+    res.status(500).send({ error: 'Failed to fetch suppliers' });
   }
 });

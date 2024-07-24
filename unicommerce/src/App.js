@@ -7,6 +7,7 @@ import Orders from './components/Orders';
 import Promotions from './components/Promotions';
 import Dashboard from './components/Dashboard';
 import './App.css';
+import '@fortawesome/fontawesome-free/css/all.min.css'; 
 
 function App() {
   return (
