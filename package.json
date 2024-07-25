@@ -1,10 +1,12 @@
 {
   "dependencies": {
+    "chart.js": "^4.4.3",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "mongodb": "^6.8.0",
     "path": "^0.12.7",
+    "react-chartjs-2": "^5.2.0",
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {

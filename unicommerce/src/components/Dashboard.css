@@ -1,33 +1,103 @@
+/* General Dashboard Styling */
 .dashboard {
   padding: 20px;
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', sans-serif; /* Modern web font */
+  background-color: #f4f7f9; /* Light background for clean look */
 }
 
+/* Grid Layout for Sections */
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Individual Section Styling */
 .dashboard-section {
-  margin-bottom: 20px;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for depth */
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
+.dashboard-section:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+/* Header Styling */
 .dashboard-section h2 {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  font-size: 1.5rem; /* Slightly larger font size */
+  color: #333; /* Darker color for text */
 }
 
+/* List Styling */
 .dashboard-section ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .dashboard-section ul li {
-  background-color: white;
-  margin: 10px auto;
-  max-width: 500px;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* Ensure consistent width for list item elements */
+.dashboard-section ul li span {
+  display: inline-block;
+  min-width: 120px; /* Adjust width as needed */
+  text-align: center;
+}
+
+/* Download Button Styling */
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  margin: 5px; /* Adjust margin to ensure proper spacing */
+}
+
+.download-btn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05); /* Slightly enlarge button on hover */
+}
+
+.download-btn svg {
+  margin-right: 8px;
+}
+
+/* Canvas Element Styling */
+.dashboard-section canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .dashboard-sections {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard-sections {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  }
 }

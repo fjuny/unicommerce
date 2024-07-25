@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import List from './CRUD/List';
+import EducationHub from './EduHub'; 
 import './Promotions.css';
 
 function Promotions() {
@@ -138,18 +139,18 @@ function Promotions() {
     }
   };
 
- // Function to format numbers
-const formatNumber = (num) => {
-  if (num >= 1000000) {
-    const formatted = (num / 1000000).toFixed(2);
-    return formatted.endsWith('.00') ? `${(num / 1000000).toFixed(0)}M` : `${formatted}M`;
-  } else if (num >= 1000) {
-    const formatted = (num / 1000).toFixed(2);
-    return formatted.endsWith('.00') ? `${(num / 1000).toFixed(0)}K` : `${formatted}K`;
-  } else {
-    return num;
-  }
-};
+  // Function to format numbers
+  const formatNumber = (num) => {
+    if (num >= 1000000) {
+      const formatted = (num / 1000000).toFixed(2);
+      return formatted.endsWith('.00') ? `${(num / 1000000).toFixed(0)}M` : `${formatted}M`;
+    } else if (num >= 1000) {
+      const formatted = (num / 1000).toFixed(2);
+      return formatted.endsWith('.00') ? `${(num / 1000).toFixed(0)}K` : `${formatted}K`;
+    } else {
+      return num;
+    }
+  };
 
   const sortInfluencers = (key) => {
     const sortedInfluencers = [...influencers].sort((a, b) => {
@@ -164,18 +165,6 @@ const formatNumber = (num) => {
     <div className="promotions-container">
       <h1>Promotions</h1>
       <div className="nav-tabs">
-        <button
-          className={activeTab === 'vouchers' ? 'active' : ''}
-          onClick={() => setActiveTab('vouchers')}
-        >
-          Vouchers
-        </button>
-        <button
-          className={activeTab === 'discounts' ? 'active' : ''}
-          onClick={() => setActiveTab('discounts')}
-        >
-          Discounts
-        </button>
         <button
           className={activeTab === 'ai-copywriting' ? 'active' : ''}
           onClick={() => setActiveTab('ai-copywriting')}
@@ -299,105 +288,98 @@ const formatNumber = (num) => {
             placeholder="Location"
             value={influencerProfile.location}
             onChange={handleInfluencerChange}
-              />
-              <input
-                type="email"
-                name="contactEmail"
-                placeholder="Contact Email"
-                value={influencerProfile.contactEmail}
-                onChange={handleInfluencerChange}
-              />
-              <button onClick={addInfluencer}>Add Influencer</button>
-              <div className="influencers-list">
-                <h3>Influencers</h3>
-                <button onClick={() => sortInfluencers('name')}>Sort by Name</button>
-                <button onClick={() => sortInfluencers('followerCount')}>Sort by Followers</button>
-                <button onClick={() => sortInfluencers('engagementRate')}>Sort by Engagement Rate</button>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Social Media</th>
-                      <th>Follower Count</th>
-                      <th>Engagement Rate</th>
-                      <th>Niche</th>
-                      <th>Average Likes</th>
-                      <th>Average Comments</th>
-                      <th>Location</th>
-                      <th>Contact Email</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {influencers.map((influencer, index) => (
-                      <tr key={index}>
-                        <td>{influencer.name}</td>
-                        <td>
-                          {/* Display social media handles in specific order */}
-                          {influencer.socialMediaHandles.Instagram && (
-    <a 
-      href={`https://instagram.com/${influencer.socialMediaHandles.Instagram.replace(/^@/, '')}`} 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      style={{ color: '#E4405F', fontSize: '20px', margin: '0 5px' }}
-    >
-      <i className="fab fa-instagram"></i>
-    </a>
-  )}
-  {influencer.socialMediaHandles.YouTube && (
-    <a 
-      href={`https://youtube.com/${influencer.socialMediaHandles.YouTube.replace(/\s+/g, '')}`} 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      style={{ color: '#FF0000', fontSize: '20px', margin: '0 5px' }}
-    >
-      <i className="fab fa-youtube"></i>
-    </a>
-  )}
-                          {influencer.socialMediaHandles.TikTok && (
-                            <a href={`https://tiktok.com/${influencer.socialMediaHandles.TikTok}`} target="_blank" rel="noopener noreferrer" style={{ color: '#000000', fontSize: '20px', margin: '0 5px' }}>
-                              <i className="fab fa-tiktok"></i>
-                            </a>
-                          )}
-                        </td>
-                        
-<td>{formatNumber(influencer.followerCount)}</td>
-<td>{influencer.engagementRate.toFixed(2).replace(/\.00$/, '')}%</td>
-<td>{influencer.niche}</td>
-<td>{formatNumber(influencer.averageLikes)}</td>
-<td>{formatNumber(influencer.averageComments)}</td>
-
-                        <td>{influencer.location}</td>
-                        <td>
-  {influencer.contactEmail && (
-    <a href={`mailto:${influencer.contactEmail}`} target="_blank" rel="noopener noreferrer" style={{ color: '#000000', fontSize: '20px' }}>
-      <i className="fas fa-envelope"></i>
-    </a>
-  )}
-</td>
-
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-          {activeTab === 'education-hub' && (
-            <div className="education-hub-container">
-              <h2>Education Hub</h2>
-              <div className="training-section">
-                <h3>Organic Digital Marketing</h3>
-                <p>Access comprehensive training programs to enhance skills in organic digital marketing, enabling businesses to effectively reach their target audiences through various marketing strategies.</p>
-              </div>
-              <div className="entrepreneurship-section">
-                <h3>LnD for Entrepreneurship</h3>
-                <p>Support for multi-region and multi-language features, including localized content and Learning and Development programs for entrepreneurship (e.g., HRDF/e-Latih).</p>
-              </div>
-            </div>
-          )}
+          />
+          <input
+            type="email"
+            name="contactEmail"
+            placeholder="Contact Email"
+            value={influencerProfile.contactEmail}
+            onChange={handleInfluencerChange}
+          />
+          <button onClick={addInfluencer}>Add Influencer</button>
+          <div className="influencers-list">
+            <h3>Influencers</h3>
+            <button onClick={() => sortInfluencers('name')}>Sort by Name</button>
+            <button onClick={() => sortInfluencers('followerCount')}>Sort by Followers</button>
+            <button onClick={() => sortInfluencers('engagementRate')}>Sort by Engagement Rate</button>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Social Media</th>
+                  <th>Follower Count</th>
+                  <th>Engagement Rate</th>
+                  <th>Niche</th>
+                  <th>Average Likes</th>
+                  <th>Average Comments</th>
+                  <th>Location</th>
+                  <th>Contact Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                {influencers.map((influencer, index) => (
+                  <tr key={index}>
+                    <td>{influencer.name}</td>
+                    <td>
+                      {influencer.socialMediaHandles.Instagram && (
+                        <a 
+                          href={`https://instagram.com/${influencer.socialMediaHandles.Instagram.replace(/^@/, '')}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ color: '#E4405F', fontSize: '20px', margin: '0 5px' }}
+                        >
+                          <i className="fab fa-instagram"></i>
+                        </a>
+                      )}
+                      {influencer.socialMediaHandles.YouTube && (
+                        <a 
+                          href={`https://youtube.com/${influencer.socialMediaHandles.YouTube.replace(/\s+/g, '')}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ color: '#FF0000', fontSize: '20px', margin: '0 5px' }}
+                        >
+                          <i className="fab fa-youtube"></i>
+                        </a>
+                      )}
+                      {influencer.socialMediaHandles.TikTok && (
+                        <a 
+                          href={`https://tiktok.com/${influencer.socialMediaHandles.TikTok}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ color: '#000000', fontSize: '20px', margin: '0 5px' }}
+                        >
+                          <i className="fab fa-tiktok"></i>
+                        </a>
+                      )}
+                    </td>
+                    <td>{formatNumber(influencer.followerCount)}</td>
+                    <td>{influencer.engagementRate.toFixed(2).replace(/\.00$/, '')}%</td>
+                    <td>{influencer.niche}</td>
+                    <td>{formatNumber(influencer.averageLikes)}</td>
+                    <td>{formatNumber(influencer.averageComments)}</td>
+                    <td>{influencer.location}</td>
+                    <td>
+                      {influencer.contactEmail && (
+                        <a 
+                          href={`mailto:${influencer.contactEmail}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ color: '#000000', fontSize: '20px' }}
+                        >
+                          <i className="fas fa-envelope"></i>
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      );
-    }
-    
-    export default Promotions;
-    
+      )}
+      {activeTab === 'education-hub' && <EducationHub />}
+    </div>
+  );
+}
+
+export default Promotions;

@@ -6,6 +6,7 @@ import Products from './components/Products';
 import Orders from './components/Orders';
 import Promotions from './components/Promotions';
 import Dashboard from './components/Dashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css'; 
 
@@ -20,8 +21,16 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/promotions" element={<Promotions />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={
+              <ErrorBoundary>
+                <Dashboard />
+              </ErrorBoundary>
+            } />
+            <Route path="/" element={
+              <ErrorBoundary>
+                <Dashboard />
+              </ErrorBoundary>
+            } />
           </Routes>
         </div>
       </div>
