@@ -11,6 +11,8 @@ const Dashboard = () => {
   const [topCategories, setTopCategories] = useState([]);
   const [influencers, setInfluencers] = useState([]);
   const [products, setProducts] = useState([]);
+  const [inventory, setInventory] = useState([]);
+  const [shortageAlerts, setShortageAlerts] = useState([]);
   const [chartError, setChartError] = useState(null);
 
   useEffect(() => {
@@ -19,6 +21,27 @@ const Dashboard = () => {
     fetchInfluencers();
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (orders.length > 0 && products.length > 0) {
+      const updatedInventory = [...inventory];
+      
+      orders.forEach(order => {
+        if (order.status === 'completed') {
+          const productName = order.productDetails?.product_name;
+          
+          updatedInventory.forEach(item => {
+            if (item.product_name === productName) {
+              item.stock -= 1; // Assuming 1 unit per order for simplicity
+            }
+          });
+        }
+      });
+
+      setInventory(updatedInventory);
+      checkForShortages(updatedInventory);
+    }
+  }, [orders, products]);
 
   const fetchSuppliers = async () => {
     try {
@@ -69,6 +92,11 @@ const Dashboard = () => {
       }
       const data = await response.json();
       setProducts(data);
+      setInventory(data.map(product => ({
+        product_name: product.product_name,
+        stock: product.stock || 0, // Assuming `stock` is part of the product data
+        minimum_stock_level: 5 // Set a threshold for alerting
+      })));
     } catch (error) {
       console.error('Failed to fetch products:', error);
     }
@@ -89,6 +117,14 @@ const Dashboard = () => {
       .map(([name, count]) => ({ name, count }));
 
     setTopCategories(sortedCategories);
+  };
+
+  const checkForShortages = (updatedInventory) => {
+    const alerts = updatedInventory
+      .filter(item => item.stock <= item.minimum_stock_level)
+      .map(item => ({ product_name: item.product_name, stock: item.stock }));
+
+    setShortageAlerts(alerts);
   };
 
   const downloadJson = (data, filename) => {
@@ -291,6 +327,20 @@ const Dashboard = () => {
             <p>Error loading chart: {chartError.message}</p>
           ) : (
             <Bar data={salesData} options={salesOptions} />
+          )}
+        </div>
+        <div className="dashboard-section">
+          <h2>Inventory Shortages</h2>
+          {shortageAlerts.length > 0 ? (
+            <div className="alert-section">
+              {shortageAlerts.map((alert, index) => (
+                <div key={index} className="alert">
+                  <span>⚠️ {alert.product_name} is running low. Stock remaining: {alert.stock}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No shortages detected.</p>
           )}
         </div>
         <div className="dashboard-section">

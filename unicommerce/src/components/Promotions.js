@@ -26,16 +26,14 @@ function Promotions() {
     location: '',
     contactEmail: ''
   });
-  const [sortKey, setSortKey] = useState('');
 
   const niches = ['Fashion', 'Tech', 'Beauty', 'Fitness', 'Travel', 'Food', 'Lifestyle', 'Gaming', 'Parenting', 'Others'];
 
   useEffect(() => {
-    if (activeTab !== 'influencers') {
-      fetchPromotions();
-    } else {
+    if (activeTab === 'influencers') {
+      
       fetchInfluencers();
-    }
+    } 
   }, [activeTab]);
 
   const fetchInfluencers = async () => {
