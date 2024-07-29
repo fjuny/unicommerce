@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import List from './CRUD/List';
 import EducationHub from './EduHub'; 
 import './Promotions.css';
+import TextGenerator from './TextGenerator';
 
 function Promotions() {
   const [promotions, setPromotions] = useState([]);
@@ -184,10 +185,7 @@ function Promotions() {
       </div>
       <div className="promotions-list">
         {activeTab !== 'ai-copywriting' && activeTab !== 'influencers' && activeTab !== 'education-hub' && (
-          <List
-            items={promotions}
-            onEdit={editPromotion}
-            onDelete={deletePromotion}
+          <TextGenerator 
           />
         )}
       </div>

@@ -2,6 +2,7 @@ const Express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
 const multer = require("multer");
+const fetch = require("node-fetch");
 
 const app = Express();
 app.use(cors());
@@ -163,6 +164,7 @@ app.get('/fyp/unicommerceapp/GetOrders', async (req, res) => {
     res.status(500).send({ error: 'Failed to fetch orders' });
   }
 });
+
 app.get('/fyp/unicommerceapp/GetSuppliers', async (req, res) => {
   try {
     const suppliers = await database.collection("suppliers").find({}).toArray();
@@ -170,5 +172,35 @@ app.get('/fyp/unicommerceapp/GetSuppliers', async (req, res) => {
   } catch (error) {
     console.error('Failed to fetch suppliers:', error);
     res.status(500).send({ error: 'Failed to fetch suppliers' });
+  }
+});
+// Example API endpoint to generate text using Ollama API
+app.post('/api/chat', async (req, res) => {
+  try {
+    const ollamaApiEndpoint = "http://localhost:11434/api/chat"; // Ensure this matches the running Ollama server
+
+    const response = await fetch(ollamaApiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama2', // Replace with your desired model
+        messages: [{ role: 'user', content: req.body.text }]
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    // Assuming result is an array of message objects
+    const finalMessage = result.map(r => r.message.content).join('');
+    
+    res.json({ role: 'assistant', content: finalMessage });
+  } catch (error) {
+    console.error('Error querying the model:', error.message);
+    res.status(500).json({ error: error.message });
   }
 });

@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [inventory, setInventory] = useState([]);
   const [shortageAlerts, setShortageAlerts] = useState([]);
   const [chartError, setChartError] = useState(null);
+  const [showAllShortages, setShowAllShortages] = useState(false);
 
   useEffect(() => {
     fetchSuppliers();
@@ -333,11 +334,16 @@ const Dashboard = () => {
           <h2>Inventory Shortages</h2>
           {shortageAlerts.length > 0 ? (
             <div className="alert-section">
-              {shortageAlerts.map((alert, index) => (
+              {shortageAlerts.slice(0, showAllShortages ? shortageAlerts.length : 5).map((alert, index) => (
                 <div key={index} className="alert">
                   <span>⚠️ {alert.product_name} is running low. Stock remaining: {alert.stock}</span>
                 </div>
               ))}
+              {shortageAlerts.length > 5 && (
+                <button onClick={() => setShowAllShortages(!showAllShortages)} className="toggle-btn">
+                  {showAllShortages ? 'Show Less' : 'Show More'}
+                </button>
+              )}
             </div>
           ) : (
             <p>No shortages detected.</p>

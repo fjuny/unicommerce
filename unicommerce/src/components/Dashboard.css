@@ -59,7 +59,7 @@
 }
 
 /* Download Button Styling */
-.download-btn {
+.download-btn,.toggle-btn {
   display: inline-flex;
   align-items: center;
   padding: 10px 20px;
