@@ -1,8 +1,12 @@
+//mvc:
+//Model
+
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { FaDownload } from 'react-icons/fa';
 import { Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
+
 
 const Dashboard = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -16,6 +20,7 @@ const Dashboard = () => {
   const [chartError, setChartError] = useState(null);
   const [showAllShortages, setShowAllShortages] = useState(false);
 
+  //Controller
   useEffect(() => {
     fetchSuppliers();
     fetchOrders();
@@ -44,6 +49,7 @@ const Dashboard = () => {
     }
   }, [orders, products]);
 
+  //Controller
   const fetchSuppliers = async () => {
     try {
       const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetSuppliers');
@@ -57,6 +63,7 @@ const Dashboard = () => {
     }
   };
 
+  //Controller
   const fetchOrders = async () => {
     try {
       const response = await fetch('http://localhost:5038/fyp/unicommerceapp/GetOrders');
@@ -271,7 +278,7 @@ const Dashboard = () => {
       },
     },
   };
-
+  //View 
   return (
     <div className="dashboard">
       <h1>Dashboard</h1>
