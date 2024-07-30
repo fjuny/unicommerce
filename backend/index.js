@@ -2,7 +2,7 @@ const Express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
 const multer = require("multer");
-const fetch = require("node-fetch");
+const fetch = require('node-fetch');
 
 const app = Express();
 app.use(cors());
@@ -174,10 +174,12 @@ app.get('/fyp/unicommerceapp/GetSuppliers', async (req, res) => {
     res.status(500).send({ error: 'Failed to fetch suppliers' });
   }
 });
-// Example API endpoint to generate text using Ollama API
+
 app.post('/api/chat', async (req, res) => {
   try {
-    const ollamaApiEndpoint = "http://localhost:11434/api/chat"; // Ensure this matches the running Ollama server
+    const ollamaApiEndpoint = "http://localhost:11434/api/chat";
+    
+    console.log('Request body:', req.body);
 
     const response = await fetch(ollamaApiEndpoint, {
       method: 'POST',
@@ -185,8 +187,9 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama2', // Replace with your desired model
-        messages: [{ role: 'user', content: req.body.text }]
+        model: 'llama2',
+        messages: [{ role: 'user', content: req.body.text }],
+        stream: false // Set to false to get a complete response
       }),
     });
 
@@ -194,13 +197,28 @@ app.post('/api/chat', async (req, res) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = await response.json();
-    // Assuming result is an array of message objects
-    const finalMessage = result.map(r => r.message.content).join('');
-    
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
+
+    let finalMessage = '';
+    const jsonLines = responseText.split('\n').filter(line => line.trim() !== '');
+
+    for (const line of jsonLines) {
+      try {
+        const parsed = JSON.parse(line);
+        if (parsed.message && parsed.message.content) {
+          finalMessage += parsed.message.content;
+        }
+      } catch (error) {
+        console.error('Error parsing JSON line:', error, 'Line:', line);
+      }
+    }
+
+    console.log('Final processed message:', finalMessage);
+
     res.json({ role: 'assistant', content: finalMessage });
   } catch (error) {
-    console.error('Error querying the model:', error.message);
+    console.error('Error querying the model:', error);
     res.status(500).json({ error: error.message });
   }
 });

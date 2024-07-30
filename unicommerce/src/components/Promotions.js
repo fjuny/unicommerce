@@ -5,7 +5,6 @@ import './Promotions.css';
 import TextGenerator from './TextGenerator';
 
 function Promotions() {
-  const [promotions, setPromotions] = useState([]);
   const [activeTab, setActiveTab] = useState('vouchers');
   const [generatedCaption, setGeneratedCaption] = useState('');
   const [productName, setProductName] = useState('');
@@ -52,39 +51,6 @@ function Promotions() {
     }
   };
 
-  const fetchPromotions = async () => {
-    try {
-      const response = await fetch(`/fyp/unicommerceapp/GetPromotions?type=${activeTab}`);
-      const data = await response.json();
-      setPromotions(data);
-    } catch (error) {
-      console.error('Error fetching promotions:', error);
-    }
-  };
-
-  const editPromotion = async (id, promotion) => {
-    try {
-      await fetch(`/fyp/unicommerceapp/EditPromotion/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(promotion)
-      });
-      fetchPromotions();
-    } catch (error) {
-      console.error('Error editing promotion:', error);
-    }
-  };
-
-  const deletePromotion = async (id) => {
-    try {
-      await fetch(`/fyp/unicommerceapp/DeletePromotion?id=${id}`, {
-        method: 'DELETE'
-      });
-      fetchPromotions();
-    } catch (error) {
-      console.error('Error deleting promotion:', error);
-    }
-  };
 
   const generateCaption = async () => {
     try {
@@ -138,7 +104,6 @@ function Promotions() {
     }
   };
 
-  // Function to format numbers
   const formatNumber = (num) => {
     if (num >= 1000000) {
       const formatted = (num / 1000000).toFixed(2);
@@ -168,7 +133,7 @@ function Promotions() {
           className={activeTab === 'ai-copywriting' ? 'active' : ''}
           onClick={() => setActiveTab('ai-copywriting')}
         >
-          AI Copywriting
+          UniAId
         </button>
         <button
           className={activeTab === 'influencers' ? 'active' : ''}
@@ -185,28 +150,11 @@ function Promotions() {
       </div>
       <div className="promotions-list">
         {activeTab !== 'ai-copywriting' && activeTab !== 'influencers' && activeTab !== 'education-hub' && (
-          <TextGenerator 
-          />
+          <TextGenerator/>
         )}
       </div>
       {activeTab === 'ai-copywriting' && (
-        <div className="ai-copywriting-container">
-          <h2>AI Copywriting</h2>
-          <input
-            type="text"
-            placeholder="Product Name"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Keyword"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <p>Generated Caption: {generatedCaption}</p>
-          <button onClick={generateCaption}>Generate Caption</button>
-        </div>
+        <TextGenerator/>
       )}
       {activeTab === 'influencers' && (
         <div className="influencer-profile-container">

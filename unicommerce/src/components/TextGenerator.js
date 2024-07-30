@@ -6,9 +6,9 @@ function ChatBot() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiEndpoint = "http://localhost:5038/api/chat"; // Ensure this matches your backend server
+  const apiEndpoint = "http://localhost:5038/api/chat";
 
-  const query = async (data, retries = 3, backoff = 1000) => {
+  const query = async (data) => {
     try {
       const response = await fetch(apiEndpoint, {
         headers: {
@@ -24,43 +24,33 @@ function ChatBot() {
       }
   
       const result = await response.json();
+      if (!result || typeof result.content !== 'string') {
+        throw new Error('Invalid response format');
+      }
       return result;
     } catch (error) {
-      if (retries > 0) {
-        setTimeout(() => query(data, retries - 1, backoff * 2), backoff);
-      } else {
-        setError(`Error querying the model: ${error.message}`);
-        console.error('Error querying the model:', error);
-      }
-      return null;
+      console.error('Error in query:', error);
+      throw error; // Re-throw the error to be caught in sendMessage
     }
   };
   
-
   const sendMessage = async () => {
     if (inputMessage.trim() === '') return;
-
+  
     const userMessage = { role: 'user', content: inputMessage };
-    setMessages([...messages, userMessage]);
+    setMessages(prevMessages => [...prevMessages, userMessage]);
     setInputMessage('');
     setLoading(true);
     setError(null);
-
+  
     try {
       const conversationContext = messages.map(msg => `${msg.role}: ${msg.content}`).join('\n') + `\nUser: ${inputMessage}\nBot:`;
-
+  
       const response = await query({ text: conversationContext });
-
-      if (response && response.content) {
-        const botResponse = response.content;
-        setMessages([...messages, userMessage, { role: 'bot', content: botResponse }]);
-      } else {
-        console.error('Unexpected response format:', response);
-        throw new Error('Invalid response format');
-      }
+      setMessages(prevMessages => [...prevMessages, { role: 'bot', content: response.content }]);
     } catch (error) {
       setError(`Error generating message: ${error.message}`);
-      console.error('Error generating message:', error.message);
+      console.error('Error generating message:', error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +58,7 @@ function ChatBot() {
 
   return (
     <div>
-      <h1>ChatBot</h1>
+      <h1>UniAId</h1>
       <div style={{ height: '300px', overflowY: 'scroll', border: '1px solid #ccc', padding: '10px' }}>
         {messages.map((msg, index) => (
           <p key={index} style={{ textAlign: msg.role === 'user' ? 'right' : 'left' }}>
@@ -81,6 +71,7 @@ function ChatBot() {
         placeholder="Type your message..."
         value={inputMessage}
         onChange={(e) => setInputMessage(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
       />
       <button onClick={sendMessage} disabled={loading}>
         {loading ? 'Sending...' : 'Send'}
