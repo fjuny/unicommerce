@@ -18,15 +18,16 @@ const subcategories = {
 const shippingOptions = ['JNT', 'DHL', 'Poslaju', 'ShopeeExpress', 'LazExpress'];
 
 function AddForm({ onAdd, formType }) {
-  const [supplier_id, setSupplierId] = useState('');
+  const [supplierId, setSupplierId] = useState('');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [countryCode, setCountryCode] = useState('+60');
   const [address, setAddress] = useState('');
+  const [contactInfo, setContactInfo] = useState({
+    email: '',
+    phone: '',
+    country_code: '+60'
+  });
 
   const [productName, setProductName] = useState('');
-  const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [currencyOptions, setCurrencyOptions] = useState([]);
   const [currency, setCurrency] = useState(null);
@@ -53,33 +54,47 @@ function AddForm({ onAdd, formType }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formType === 'supplier') {
+      // Use the format that works in EditForm
       onAdd({
-        supplier_id,
+        _id: supplierId, // Use supplierId as _id
         name,
-        contact_info: { email, phone, country_code: countryCode },
-        address
+        email: contactInfo.email,
+        phone: contactInfo.phone,
+        address,
+        contact_info: {
+          email: contactInfo.email,
+          phone: contactInfo.phone,
+          country_code: contactInfo.country_code
+        }
       });
+
+      // Reset form fields
       setSupplierId('');
       setName('');
-      setEmail('');
-      setPhone('');
-      setCountryCode('+60');
       setAddress('');
+      setContactInfo({
+        email: '',
+        phone: '',
+        country_code: '+60'
+      });
     } else if (formType === 'product') {
-      const formData = new FormData();
-      formData.append('productName', productName);
-      formData.append('description', description);
-      formData.append('price', `${currency.value} ${price}`);
-      formData.append('image', image);
-      formData.append('quantity', quantity);
-      formData.append('sku', sku);
-      formData.append('shippingOptions', selectedShippingOptions.join(', '));
-      formData.append('category', category);
-      formData.append('subcategory', subcategory);
+      // Create a plain object with the necessary data
+      const productData = {
+        product_name: productName,
+        price: parseFloat(price),
+        stock: parseInt(quantity, 10),
+        sku_id: sku,
+        shipping_options: selectedShippingOptions,
+        category,
+        subcategory,
+        image: image ? URL.createObjectURL(image) : null
+      };
 
-      onAdd(formData);
+      // Pass the plain object to the onAdd function
+      onAdd(productData);
+
+      // Reset form fields
       setProductName('');
-      setDescription('');
       setPrice('');
       setCurrency(currencyOptions.find(option => option.value === 'MYR'));
       setImage(null);
@@ -93,8 +108,8 @@ function AddForm({ onAdd, formType }) {
   };
 
   const handlePhoneChange = (value) => {
-    setPhone(value);
-    setCountryCode(value.slice(0, 3));
+    setContactInfo({ ...contactInfo, phone: value });
+    setContactInfo({ ...contactInfo, country_code: value.slice(0, 3) });
   };
 
   const handleImageChange = (e) => {
@@ -138,7 +153,7 @@ function AddForm({ onAdd, formType }) {
           <input
             type="text"
             placeholder="Supplier ID"
-            value={supplier_id}
+            value={supplierId}
             onChange={(e) => setSupplierId(e.target.value)}
             className="form-input"
             required
@@ -153,18 +168,26 @@ function AddForm({ onAdd, formType }) {
           />
           <input
             type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Contact Email"
+            value={contactInfo.email}
+            onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
             className="form-input"
             required
           />
           <PhoneInput
             international
             defaultCountry="MY"
-            placeholder="Phone"
-            value={phone}
+            placeholder="Contact Phone"
+            value={contactInfo.phone}
             onChange={handlePhoneChange}
+            className="form-input"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Country Code"
+            value={contactInfo.country_code}
+            onChange={(e) => setContactInfo({ ...contactInfo, country_code: e.target.value })}
             className="form-input"
             required
           />
@@ -178,6 +201,7 @@ function AddForm({ onAdd, formType }) {
           />
         </>
       )}
+
       {formType === 'product' && (
         <>
           <input
@@ -185,14 +209,6 @@ function AddForm({ onAdd, formType }) {
             placeholder="Product Name"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
-            className="form-input"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
             className="form-input"
             required
           />
@@ -217,7 +233,7 @@ function AddForm({ onAdd, formType }) {
             </div>
             <input
               type="number"
-              placeholder="QTY"
+              placeholder="Stock Quantity"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               className="quantity-input form-input"

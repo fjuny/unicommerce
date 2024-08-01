@@ -19,6 +19,7 @@ function Products() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log('Fetched Products:', data); 
       setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -28,12 +29,14 @@ function Products() {
 
   const addProduct = async (formData) => {
     try {
-      await fetch('http://localhost:5038/fyp/unicommerceapp/AddProduct', { 
+      const response = await fetch('http://localhost:5038/fyp/unicommerceapp/AddProduct', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      fetchProducts();
+      const addedProduct = await response.json();
+      console.log('Added Product:', addedProduct); 
+      fetchProducts(); 
     } catch (error) {
       console.error('Error adding product:', error);
       setError(error.message);
