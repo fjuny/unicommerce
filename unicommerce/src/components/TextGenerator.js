@@ -30,7 +30,7 @@ function ChatBot() {
       return result;
     } catch (error) {
       console.error('Error in query:', error);
-      throw error; // Re-throw the error to be caught in sendMessage
+      throw error; 
     }
   };
   

@@ -189,7 +189,7 @@ app.post('/api/chat', async (req, res) => {
       body: JSON.stringify({
         model: 'llama2',
         messages: [{ role: 'user', content: req.body.text }],
-        stream: false // Set to false to get a complete response
+        stream: false 
       }),
     });
 

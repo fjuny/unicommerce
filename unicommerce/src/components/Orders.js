@@ -169,7 +169,6 @@ const Orders = () => {
 function calculateOrderScore(order, priorityCriteria) {
   const { total, customerLoyalty, date } = order;
   
-  // Ensure that total, customerLoyalty, and date are valid numbers
   const validTotal = typeof total === 'number' && !isNaN(total) ? total : 0;
   const validCustomerLoyalty = typeof customerLoyalty === 'number' && !isNaN(customerLoyalty) ? customerLoyalty : 0;
   const validDate = new Date(date).getTime();

@@ -256,15 +256,15 @@ th {
 }
 
 .social-media-icon.instagram {
-  color: #C13584; /* Instagram brand color */
+  color: #C13584;  
 }
 
 .social-media-icon.youtube {
-  color: #FF0000; /* YouTube brand color */
+  color: #FF0000;
 }
 
 .social-media-icon.tiktok {
-  color: #000000; /* TikTok brand color */
+  color: #000000;
 }
 
 .table-container {
@@ -275,14 +275,14 @@ th {
 table {
   width: 100%;
   border-collapse: collapse;
-  text-align: center; /* Center align text in table */
+  text-align: center; 
 }
 
 th, td {
-  padding: 10px; /* Optional: Add padding for better readability */
-  border: 1px solid #ddd; /* Optional: Add border for clarity */
+  padding: 10px;
+  border: 1px solid #ddd;
 }
 
 th {
-  background-color: #f4f4f4; /* Optional: Add background color for headers */
+  background-color: #f4f4f4;
 }

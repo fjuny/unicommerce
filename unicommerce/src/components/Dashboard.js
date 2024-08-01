@@ -72,7 +72,7 @@ const Dashboard = () => {
       }
       const data = await response.json();
       setOrders(data);
-      setTopOrders(data.slice(0, 5)); // Assuming top 5 orders by date
+      setTopOrders(data.slice(0, 5)); 
       calculateTopCategories(data);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
@@ -102,8 +102,8 @@ const Dashboard = () => {
       setProducts(data);
       setInventory(data.map(product => ({
         product_name: product.product_name,
-        stock: product.stock || 0, // Assuming `stock` is part of the product data
-        minimum_stock_level: 5 // Set a threshold for alerting
+        stock: product.stock || 0, 
+        minimum_stock_level: 5 
       })));
     } catch (error) {
       console.error('Failed to fetch products:', error);
@@ -161,7 +161,7 @@ const Dashboard = () => {
 
   const downloadCsv = (data, filename) => {
     const csvRows = [
-      Object.keys(data[0] || {}).map(key => key.charAt(0).toUpperCase() + key.slice(1)), // Header row
+      Object.keys(data[0] || {}).map(key => key.charAt(0).toUpperCase() + key.slice(1)), 
       ...data.map(item => Object.values(item))
     ];
     const csvContent = csvRows.map(row => row.join(',')).join('\n');

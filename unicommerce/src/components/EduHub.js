@@ -3,14 +3,12 @@ import './EduHub.css';
 
 function EducationHub() {
   useEffect(() => {
-    // Create a script element
     const script = document.createElement('script');
     script.src = 'https://static.elfsight.com/platform/platform.js';
     script.setAttribute('data-use-service-core', 'defer');
     script.async = true;
     document.body.appendChild(script);
 
-    // Cleanup function to remove the script when the component unmounts
     return () => {
       document.body.removeChild(script);
     };
